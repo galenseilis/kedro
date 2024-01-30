@@ -1,5 +1,13 @@
 # Modular pipelines
 
+```{tags} Warning: This page needs update. See [#2825](https://github.com/kedro-org/kedro/issues/2825) for details
+```
+
+
+```{tags} Danger: This page needs needs rewriting. See [#2825](https://github.com/kedro-org/kedro/issues/2825) for details
+```
+
+
 ## What are modular pipelines?
 
 In many typical Kedro projects, a single (“main”) pipeline increases in complexity as the project evolves. To keep your project fit for purpose, we recommend that you create modular pipelines, which are logically isolated and can be reused. Modular pipelines are easier to develop, test and maintain, and are portable so they can be copied and reused between projects.

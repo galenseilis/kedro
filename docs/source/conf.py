@@ -55,6 +55,8 @@ extensions = [
     "sphinxcontrib.jquery",
     "sphinx.ext.intersphinx",
     "sphinxcontrib.youtube",
+    "sphinx_tags",
+    "sphinx_design",
 ]
 
 # enable autosummary plugin  (table of contents for modules/classes/class
@@ -69,6 +71,20 @@ templates_path = ["_templates"]
 intersphinx_mapping = {
     "kedro-viz": ("https://docs.kedro.org/projects/kedro-viz/en/v6.6.1/", None),
     "kedro-datasets": ("https://docs.kedro.org/projects/kedro-datasets/en/kedro-datasets-2.0.0/", None),
+}
+
+# Sphinx tags
+
+tags_create_tags = True
+tags_extension = ["md", "rst"]
+tags_overview_title = "Kedro documentation tagss"
+tags_page_title = "Tags"
+tags_page_header = "Pages with this tag"
+tags_intro_text = ""
+tags_create_badges = True
+tags_badge_colors = {
+    "Warning:*": "warning",
+    "Danger:*": "danger",
 }
 
 # The suffix(es) of source filenames.
@@ -94,9 +110,8 @@ exclude_patterns = [
     "_templates",
     "modules.rst",
     "source",
-    "kedro_docs_style_guide.md",
+    "_tags/*"
 ]
-
 
 type_targets = {
     "py:class": (
