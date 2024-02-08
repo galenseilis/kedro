@@ -909,8 +909,8 @@ def _topologically_sorted(node_dependencies: dict[Node, set[Node]]) -> list[list
 
     try:
         # Sort it so it has consistent order when run with SequentialRunner
-        result = [sorted(dependencies) for dependencies in toposort(node_dependencies)]
-        return result
+        return list(toposort(node_dependencies))
+        # return result
     except ToposortCircleError as exc:
         message = _circle_error_message(exc.data)
         raise CircularDependencyError(message) from exc

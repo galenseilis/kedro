@@ -162,10 +162,11 @@ class Node:
             return NotImplemented
         return self._unique_key == other._unique_key
 
-    def __lt__(self, other: Any) -> bool:
-        if not isinstance(other, Node):
-            return NotImplemented
-        return self._unique_key < other._unique_key
+    # def __lt__(self, other: Any) -> bool:
+    #     "__lt__ is used when toposort is trying to raise a CircularDependencyError"
+    #     if not isinstance(other, Node):
+    #         return NotImplemented
+    #     return self._unique_key < other._unique_key
 
     def __hash__(self) -> int:
         return hash(self._unique_key)
@@ -641,6 +642,7 @@ def _to_list(element: str | Iterable[str] | dict[str, str] | None) -> list[str]:
         return [element]
     if isinstance(element, dict):
         return list(element.values())
+
     return list(element)
 
 
