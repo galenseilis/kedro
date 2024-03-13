@@ -116,6 +116,7 @@ class KedroSession:
 
         hook_manager = _create_hook_manager()
         _register_hooks(hook_manager, settings.HOOKS)
+        print(f"  DEBUG {settings=} {settings.HOOKS=} Inside session")
         _register_hooks_entry_points(hook_manager, settings.DISABLE_HOOKS_FOR_PLUGINS)
         self._hook_manager = hook_manager
 

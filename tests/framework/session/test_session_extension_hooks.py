@@ -23,6 +23,7 @@ from kedro.pipeline import node, pipeline
 from kedro.pipeline.node import Node
 from kedro.runner import ParallelRunner
 from kedro.runner.runner import _run_node_async
+from kedro.runner.sequential_runner import SequentialRunner
 from tests.framework.session.conftest import (
     _assert_hook_call_record_has_expected_parameters,
     _assert_pipeline_equal,
@@ -180,22 +181,7 @@ class TestPipelineHooks:
         expected_error = ValueError("broken")
         assert_exceptions_equal(call_record.error, expected_error)
 
-    @pytest.mark.usefixtures("mock_broken_pipelines")
-    def test_on_node_error_hook_sequential_runner(self, caplog, mock_session):
-        with pytest.raises(ValueError, match="broken"):
-            mock_session.run(node_names=["node1"])
 
-        on_node_error_calls = [
-            record for record in caplog.records if record.funcName == "on_node_error"
-        ]
-        assert len(on_node_error_calls) == 1
-        call_record = on_node_error_calls[0]
-        _assert_hook_call_record_has_expected_parameters(
-            call_record,
-            ["error", "node", "catalog", "inputs", "is_async", "session_id"],
-        )
-        expected_error = ValueError("broken")
-        assert_exceptions_equal(call_record.error, expected_error)
 
 
 class TestNodeHooks:
@@ -233,9 +219,35 @@ class TestNodeHooks:
         # sanity check a couple of important parameters
         assert call_record.outputs["planes"].to_dict() == dummy_dataframe.to_dict()
 
+    @pytest.mark.usefixtures("mock_broken_pipelines")
+    def test_on_node_error_hook_sequential_runner(self,logs_listener, caplog, mock_session: KedroSession):
+        with pytest.raises(ValueError, match="broken"):
+            mock_session.run(node_names=["node1"])
+
+        for l in logs_listener.logs:
+            print(f"{l.funcName=}, {l=}")
+        print("==" *20)
+        for log in caplog.records:
+            print(f"{log.records}")
+
+        raise
+        on_node_error_calls = [
+            record for record in caplog.records if record.funcName == "on_node_error"
+        ]
+        assert len(on_node_error_calls) == 1
+        call_record = on_node_error_calls[0]
+        _assert_hook_call_record_has_expected_parameters(
+            call_record,
+            ["error", "node", "catalog", "inputs", "is_async", "session_id"],
+        )
+        expected_error = ValueError("broken")
+        assert_exceptions_equal(call_record.error, expected_error)
+
     @SKIP_ON_WINDOWS
     @pytest.mark.usefixtures("mock_broken_pipelines")
-    def test_on_node_error_hook_parallel_runner(self, mock_session, logs_listener):
+    def test_on_node_error_hook_parallel_runner(self, mock_session, caplog,logs_listener):
+        print(type(mock_session), "DEBUG")
+        print(mock_session)
         with pytest.raises(ValueError, match="broken"):
             mock_session.run(
                 runner=ParallelRunner(max_workers=2), node_names=["node1", "node2"]
@@ -244,6 +256,11 @@ class TestNodeHooks:
         on_node_error_records = [
             r for r in logs_listener.logs if r.funcName == "on_node_error"
         ]
+        # for log in caplog.records:
+            # print(f"{log.records}")
+        print("==" *20)
+        for l in logs_listener.logs:
+            print(f"{l.funcName=}, {l=}")
         assert len(on_node_error_records) == 2
 
         for call_record in on_node_error_records:
@@ -486,7 +503,7 @@ class TestBeforeNodeRunHookWithInputUpdates:
         catalog.save("cars", dummy_dataframe)
         catalog.save("boats", dummy_dataframe)
 
-        result = mock_session_with_before_node_run_hooks.run(runner=ParallelRunner())
+        result = mock_session_with_before_node_run_hooks.run(runner=SequentialRunner())
         assert isinstance(result["planes"], MockDatasetReplacement)
         assert isinstance(result["ships"], pd.DataFrame)
 

@@ -81,11 +81,13 @@ def _run_node_synchronization(  # noqa: PLR0913
         The node argument.
 
     """
+    print("  _eun_nosw_async DEBUG")
     if multiprocessing.get_start_method() == "spawn" and package_name:
         _bootstrap_subprocess(package_name, logging_config)
-
+        print("  _eun_nosw_async DEBUG bootstrap")
     hook_manager = _create_hook_manager()
     _register_hooks(hook_manager, settings.HOOKS)
+    print(f"  DEBUG {settings=} {settings.HOOKS=} {package_name=}")
     _register_hooks_entry_points(hook_manager, settings.DISABLE_HOOKS_FOR_PLUGINS)
 
     return run_node(node, catalog, hook_manager, is_async, session_id)
